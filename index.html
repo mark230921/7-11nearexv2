@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Near Ex - Login</title>
+  <style>
+    * {
+        box-sizing: border-box;
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: #020617; /* Midnight Navy Desktop Background */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    /* Smartphone App Wrapper Frame */
+    .app-wrapper {
+        width: 100%;
+        max-width: 430px; /* iPhone Pro Max standard width */
+        height: 100vh;
+        max-height: 932px;
+        background-color: #090d16; /* Midnight Navy App Background */
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        position: relative;
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+        overflow-y: auto;
+        padding: 20px;
+    }
+
+    @media (min-width: 431px) {
+        .app-wrapper {
+            border-radius: 40px;
+            border: 10px solid #1e293b;
+        }
+    }
+
+    /* Prototype Marquee Banner */
+    .prototype-banner {
+        background: #431407;
+        border: 1px dashed #9a3412;
+        border-radius: 10px;
+        padding: 8px 12px;
+        font-size: 11px;
+        color: #fdba74;
+        text-align: center;
+        font-style: italic;
+        margin-bottom: 10px;
+        flex-shrink: 0;
+    }
+
+    /* Center Content Container */
+    .content-container {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding-bottom: 40px;
+    }
+
+    .top-image {
+      display: block;
+      margin: 0 auto 20px auto;
+      width: 120px;
+      height: 120px;
+      object-fit: contain;
+    }
+
+    .login-card { 
+      background: #1e293b; 
+      padding: 28px 24px; 
+      border-radius: 20px; 
+      border: 1px solid #334155;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3); 
+      width: 100%; 
+      max-width: 360px;
+      text-align: center;
+    }
+
+    .login-card h2 {
+      font-size: 18px;
+      font-weight: 700;
+      color: #f8fafc;
+      margin: 0 0 4px 0;
+      letter-spacing: -0.3px;
+    }
+
+    .login-card h3 {
+      font-size: 12px;
+      font-weight: 600;
+      color: #94a3b8;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin: 0 0 24px 0;
+    }
+
+    .input-group {
+      position: relative;
+      margin-bottom: 16px;
+      text-align: left;
+    }
+
+    .input-group label {
+      display: block;
+      font-size: 11px;
+      font-weight: 700;
+      color: #94a3b8;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+    }
+
+    input { 
+      font-family: inherit;
+      width: 100%; 
+      padding: 12px 14px; 
+      background: #090d16;
+      border: 1px solid #334155; 
+      border-radius: 12px;
+      font-size: 14px;
+      color: #f8fafc;
+      outline: none;
+      box-sizing: border-box;
+      transition: all 0.2s ease;
+    }
+
+    input:focus { 
+      background: #090d16;
+      border-color: #FF6600; 
+      box-shadow: 0 0 0 3px rgba(255, 102, 0, 0.2);
+    }
+
+    input::placeholder {
+      color: #64748b;
+    }
+
+    button.login-btn { 
+      font-family: inherit;
+      width: 100%; 
+      padding: 14px; 
+      background: #FF6600; 
+      color: #ffffff;
+      border: none; 
+      border-radius: 12px; 
+      cursor: pointer; 
+      font-weight: 700;
+      font-size: 15px;
+      box-shadow: 0 4px 12px rgba(255, 102, 0, 0.3);
+      transition: transform 0.1s ease, background 0.2s ease;
+      margin-top: 8px;
+    }
+    
+    button.login-btn:active { 
+      transform: scale(0.98); 
+      background: #e65c00; 
+    }
+
+    #message { 
+      margin-top: 14px; 
+      font-size: 13px; 
+      font-weight: 600; 
+      min-height: 18px;
+    }
+  </style>
+</head>
+<body> 
+
+  <div class="app-wrapper">
+  
+    <div class="prototype-banner">
+       *This project was only a prototype developed by: Mark Jake*
+    </div>
+    
+    <div class="content-container">
+      <img class="top-image" src="login.png" alt="Login Image" onerror="this.style.display='none'">
+      
+      <div class="login-card">
+        <h2>NEAR EX PROJECT</h2>
+        <h3>Secure Login</h3>
+        
+        <div class="input-group">
+          <label for="username">Username</label>
+          <input type="text" id="username" placeholder="Enter username">
+        </div>
+
+        <div class="input-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" placeholder="Enter password">
+        </div>
+        
+        <button class="login-btn" onclick="handleLogin()">LOG IN</button>
+        <div id="message"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    function handleLogin() {
+      var user = document.getElementById('username').value;
+      var pass = document.getElementById('password').value;
+      var msgDiv = document.getElementById('message');
+      
+      msgDiv.style.color = '#94a3b8';
+      msgDiv.innerText = 'Checking credentials...';
+
+      var scriptURL = 'https://script.google.com/macros/s/AKfycbwkDjXXLwfGRHkdkMlp2P94cZm6iXX4n0yJdCfbDkTffadNvsRkrDk09v0cyF_ALRyWNQ/exec'; 
+      var targetURL = scriptURL + '?username=' + encodeURIComponent(user) + '&password=' + encodeURIComponent(pass);
+
+      fetch(targetURL)
+        .then(response => response.json())
+        .then(result => {
+          if (result.success) {
+            msgDiv.style.color = '#34d399';
+            msgDiv.innerText = result.message + ' Redirecting...';
+            setTimeout(function() {
+              window.location.href = 'portal.html'; 
+            }, 1000);
+          } else {
+            msgDiv.style.color = '#f87171';
+            msgDiv.innerText = result.message;
+          }
+        })
+        .catch(error => {
+          msgDiv.style.color = '#f87171';
+          msgDiv.innerText = 'Connection error. Try again.';
+        });
+    }
+  </script>
+</body>
+</html>
