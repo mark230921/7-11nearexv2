@@ -97,7 +97,7 @@
             flex: 1;
             overflow-y: auto;
             padding: 16px;
-            padding-bottom: 24px;
+            padding-bottom: 24px; /* Clean bottom padding without nav bar */
         }
 
         /* Prototype Marquee Banner */
@@ -159,47 +159,10 @@
             color: #64748b;
         }
 
+        /* Fix dropdown options readability in dark mode */
         select option {
             background-color: #1e293b;
             color: #f8fafc;
-        }
-
-        /* Custom Camera Upload Button Styling */
-        .camera-upload-container {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .camera-btn {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            width: 100%;
-            padding: 12px;
-            background: #334155;
-            color: #f8fafc;
-            border: 1px dashed #64748b;
-            border-radius: 10px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 0.2s ease, border-color 0.2s ease;
-        }
-
-        .camera-btn:hover {
-            background: #475569;
-            border-color: #FF6600;
-        }
-
-        #image_preview {
-            display: none;
-            width: 100%;
-            max-height: 160px;
-            object-fit: cover;
-            border-radius: 8px;
-            border: 1px solid #475569;
         }
 
         /* Main Submit Button (App CTA Style) */
@@ -265,40 +228,42 @@
             font-weight: 600;
             cursor: pointer;
         }
-
         .floating-btn {
-            width: 46px;
-            height: 46px;
-            position: absolute;
-            bottom: 20px;          
-            right: 20px;           
-            background: #1e293b;   
-            border: 1px solid #334155;
-            border-radius: 50%;    
-            cursor: pointer;       
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4); 
-            z-index: 1000;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background-image: url('exit.png'); 
-            background-size: 100%;                  
-            background-position: center;             
-            background-repeat: no-repeat;    
-            transition: transform 0.15s ease, box-shadow 0.15s ease, background-color 0.15s;
-        }
-        
-        .floating-btn:active {
-            transform: scale(0.92);
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
-            background-color: #334155;
-        }
+      width: 46px;
+      height: 46px;
+      position: absolute;       /* Absolute inside the app frame so it floats naturally */
+      bottom: 20px;          
+      right: 20px;           
+      background: #1e293b;   
+      border: 1px solid #334155;
+      border-radius: 50%;    
+      cursor: pointer;       
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4); 
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-image: url('exit.png'); 
+      background-size: 100%;                  
+      background-position: center;             
+      background-repeat: no-repeat;    
+      transition: transform 0.15s ease, box-shadow 0.15s ease, background-color 0.15s;
+    }
+    
+    .floating-btn:active {
+      transform: scale(0.92);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
+      background-color: #334155;
+    }
     </style>
 </head>
 <body>
 
     <!-- Smartphone App Frame Wrapper -->
     <div class="app-wrapper" id="appWrapper">
+
+        <!-- Hidden Iframe for backend submission -->
+        <iframe name="hidden_iframe" id="hidden_iframe" style="display:none;" onload="if(isSubmitted) { showThankYou(); }"></iframe>
 
         <!-- Top Header App Bar -->
         <header class="app-header">
@@ -378,21 +343,9 @@
                         <input type="number" id="item_sku" name="entry.1073271044" placeholder="Enter item code" required>
                     </div>
                     
-                    <!-- CAMERA & UPLOAD PHOTO CARD -->
                     <div class="form-card">
-                        <label class="question-title">Capture Item Photo</label>
-                        <div class="camera-upload-container">
-                            <!-- Hidden native file input configured to launch device camera -->
-                            <input type="file" id="item_image" name="item_image" accept="image/*" capture="environment" style="display:none;" required>
-                            
-                            <!-- Custom Camera Trigger Button -->
-                            <button type="button" class="camera-btn" onclick="document.getElementById('item_image').click();">
-                                📷 <span id="camera_btn_text">Open Camera / Take Photo</span>
-                            </button>
-                            
-                            <!-- Live Thumbnail Preview -->
-                            <img id="image_preview" alt="Captured Photo Preview">
-                        </div>
+                        <label class="question-title" for="item_image">Upload Item Photo</label>
+                        <input type="file" id="item_image" name="item_image" accept="image/*" capture="environment" style="color: #f8fafc; font-size: 13px;" required>
                     </div>
 
                     <!-- EXPIRATION DATE -->
@@ -417,8 +370,7 @@
                     <div class="submit-btn-container">
                         <button type="submit" class="submit-btn">SUBMIT REQUEST</button>
                     </div>
-                    
-                    <button type="button" class="floating-btn" onclick="window.location.href='portal.html';" title="Back to Portal"></button>
+                          <button class="floating-btn" onclick="window.location.href='portal.html';" title="Back to Portal"></button>
 
                 </form>
             </div>
@@ -427,7 +379,7 @@
             <div class="thank-you-card" id="thankYouMessage">
                 <h2>Submitted Successfully!</h2>
                 <p>Your near expiry request has been securely recorded.</p>
-                <button type="button" class="reset-btn" onclick="submitAnother()">SUBMIT ANOTHER ENTRY</button>    
+                <button class="reset-btn" onclick="submitAnother()">SUBMIT ANOTHER ENTRY</button>    
             </div>
 
         </div>
@@ -443,17 +395,6 @@
         reader.onerror = error => reject(error);
     });
 
-    // Preview image instantly once captured/selected
-    document.getElementById('item_image').addEventListener('change', function(e) {
-        const file = e.target.files[0];
-        if (file) {
-            const preview = document.getElementById('image_preview');
-            preview.src = URL.createObjectURL(file);
-            preview.style.display = 'block';
-            document.getElementById('camera_btn_text').innerText = 'Retake Photo';
-        }
-    });
-
     document.getElementById('myForm').addEventListener('submit', async function(e) {
         e.preventDefault(); 
         
@@ -464,20 +405,23 @@
         if (fileInput.files.length > 0) {
             const originalFile = fileInput.files[0];
             
-            // 1. Get the value from the Store Name-Number input field and format it for the file name
+            // 1. Get the value from the Store Name-Number input field
             let storeVal = document.getElementById('store_district').value.trim();
+            
+            // Fallback or clean up invalid characters for file naming if needed
             storeVal = storeVal ? storeVal.replace(/[^a-zA-Z0-9-_]/g, '_') : 'Store';
             
-            // 2. Get file extension
+            // 2. Get file extension (e.g., .jpg, .png) from the original file name
             const fileExtension = originalFile.name.split('.').pop() || 'jpg';
             
-            // 3. Create a clean date timestamp
+            // 3. Create a clean timestamp to ensure unique filenames
             const timestamp = new Date().toISOString().slice(0, 10).replace(/-/g, '');
             
-            // 4. Construct renamed filename (e.g., Store_123_20260925.jpg)
+            // 4. Construct the new filename: e.g., "Store123_20260925.jpg"
             imageName = `${storeVal}_${timestamp}.${fileExtension}`;
 
             try {
+                // Read the file and convert to Base64 using the original file object
                 imageBase64 = await getBase64(originalFile);
             } catch (err) {
                 console.error('Image conversion error:', err);
@@ -496,7 +440,7 @@
             expiration_date: document.getElementById('expiration_date').value,
             suggested_promo: document.getElementById('suggested_promo').value,
             image_data: imageBase64,  
-            image_name: imageName 
+            image_name: imageName // This sends the newly renamed file name to Google Drive
         };
 
         // Send data to your Google Apps Script Web App URL
@@ -522,12 +466,11 @@
 
     function submitAnother() {
         document.getElementById('myForm').reset();
-        document.getElementById('image_preview').style.display = 'none';
-        document.getElementById('camera_btn_text').innerText = 'Open Camera / Take Photo';
         document.getElementById('thankYouMessage').style.display = 'none';
         document.getElementById('formContainer').style.display = 'block';
     }
 </script>
+
 
 </body>
 </html>
