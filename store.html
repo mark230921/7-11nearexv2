@@ -36,6 +36,31 @@
             overflow: hidden;
             transition: background-color 0.3s ease;
         }
+            /* Pull-to-Refresh Spinner Indicator */
+        .refresh-indicator {
+            position: absolute;
+            top: -50px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 50px;
+            background: var(--card-bg, #1e293b);
+            border: 2px solid var(--border-color, #334155);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            transition: top 0.2s ease, transform 0.2s ease;
+            z-index: 100;
+            color: #FF6600;
+            font-size: 16px;
+        }
+
+        .refresh-indicator.visible {
+            top: 70px; /* Drops down below the header when pulled */
+        }
+
 
         @media (min-width: 431px) {
             .app-wrapper {
@@ -255,12 +280,20 @@
       box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
       background-color: #334155;
     }
+    
     </style>
 </head>
 <body>
 
-    <!-- Smartphone App Frame Wrapper -->
-    <div class="app-wrapper" id="appWrapper">
+                <!-- Smartphone App Frame Wrapper -->
+        <div class="app-wrapper" id="appWrapper">
+
+            <!-- Pull to Refresh Spinner Element -->
+            <div class="refresh-indicator" id="refreshIndicator">Refresh...</div>
+
+            <!-- Top Header App Bar -->
+            ...
+
 
         <!-- Hidden Iframe for backend submission -->
         <iframe name="hidden_iframe" id="hidden_iframe" style="display:none;" onload="if(isSubmitted) { showThankYou(); }"></iframe>
@@ -469,6 +502,44 @@
         document.getElementById('thankYouMessage').style.display = 'none';
         document.getElementById('formContainer').style.display = 'block';
     }
+    
+        // Pull-to-Refresh Logic for Mobile & Web
+    let touchStartY = 0;
+    let isRefreshing = false;
+    const appBody = document.querySelector('.app-body');
+    const refreshIndicator = document.getElementById('refreshIndicator');
+
+    appBody.addEventListener('touchstart', (e) => {
+        // Only trigger if scrolled all the way to the top
+        if (appBody.scrollTop === 0) {
+            touchStartY = e.touches[0].clientY;
+        } else {
+            touchStartY = 0;
+        }
+    }, { passive: true });
+
+    appBody.addEventListener('touchmove', (e) => {
+        if (!touchStartY || isRefreshing) return;
+
+        const touchY = e.touches[0].clientY;
+        const pullDistance = touchY - touchStartY;
+
+        // If pulled down more than 80px from the top
+        if (pullDistance > 80 && appBody.scrollTop === 0) {
+            isRefreshing = true;
+            refreshIndicator.classList.add('visible');
+            refreshIndicator.style.transform = `translateX(-50%) rotate(360deg)`;
+            
+            setTimeout(() => {
+                location.reload(); // Refresh the web page
+            }, 600);
+        }
+    }, { passive: true });
+
+    appBody.addEventListener('touchend', () => {
+        touchStartY = 0;
+    });
+
 </script>
 
 
