@@ -35,7 +35,7 @@
             box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
             overflow: hidden;
             transition: background-color 0.3s ease;
-        }
+        } 
 
         @media (min-width: 431px) {
             .app-wrapper {
@@ -260,8 +260,9 @@
 </head>
 <body>
 
-                <!-- Smartphone App Frame Wrapper -->
-        <div class="app-wrapper" id="appWrapper">
+    <!-- Smartphone App Frame Wrapper -->
+    <div class="app-wrapper" id="appWrapper">
+
         <!-- Hidden Iframe for backend submission -->
         <iframe name="hidden_iframe" id="hidden_iframe" style="display:none;" onload="if(isSubmitted) { showThankYou(); }"></iframe>
 
@@ -387,17 +388,54 @@
     </div>
 
 <script>
-    // Helper function to convert file to Base64
-    const getBase64 = (file) => new Promise((resolve, reject) => {
+    // Helper function to resize and compress image before base64 conversion
+    const compressAndConvertImage = (file) => new Promise((resolve, reject) => {
         const reader = new FileReader();
         reader.readAsDataURL(file);
-        reader.onload = () => resolve(reader.result);
-        reader.onerror = error => reject(error);
+        reader.onload = (event) => {
+            const img = new Image();
+            img.src = event.target.result;
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                const MAX_WIDTH = 1000; // Resize max width to save bandwidth
+                const MAX_HEIGHT = 1000;
+                let width = img.width;
+                let height = img.height;
+
+                if (width > height) {
+                    if (width > MAX_WIDTH) {
+                        height *= MAX_WIDTH / width;
+                        width = MAX_WIDTH;
+                    }
+                } else {
+                    if (height > MAX_HEIGHT) {
+                        width *= MAX_HEIGHT / height;
+                        height = MAX_HEIGHT;
+                    }
+                }
+
+                canvas.width = width;
+                canvas.height = height;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, width, height);
+
+                // Compress to JPEG with 70% quality
+                const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.7);
+                resolve(compressedDataUrl);
+            };
+            img.onerror = (error) => reject(error);
+        };
+        reader.onerror = (error) => reject(error);
     });
 
     document.getElementById('myForm').addEventListener('submit', async function(e) {
         e.preventDefault(); 
         
+        // Show a loading text or disable button so user knows it's working
+        const submitBtn = document.querySelector('.submit-btn');
+        submitBtn.textContent = 'PROCESSING & SUBMITTING...';
+        submitBtn.disabled = true;
+
         const fileInput = document.getElementById('item_image');
         let imageBase64 = "";
         let imageName = "";
@@ -405,27 +443,20 @@
         if (fileInput.files.length > 0) {
             const originalFile = fileInput.files[0];
             
-            // 1. Get the value from the Store Name-Number input field
             let storeVal = document.getElementById('store_district').value.trim();
-            
-            // Fallback or clean up invalid characters for file naming if needed
             storeVal = storeVal ? storeVal.replace(/[^a-zA-Z0-9-_]/g, '_') : 'Store';
             
-            // 2. Get file extension (e.g., .jpg, .png) from the original file name
-            const fileExtension = originalFile.name.split('.').pop() || 'jpg';
-            
-            // 3. Create a clean timestamp to ensure unique filenames
             const timestamp = new Date().toISOString().slice(0, 10).replace(/-/g, '');
-            
-            // 4. Construct the new filename: e.g., "Store123_20260925.jpg"
-            imageName = `${storeVal}_${timestamp}.${fileExtension}`;
+            imageName = `${storeVal}_${timestamp}.jpg`; // Forced standard optimized jpg
 
             try {
-                // Read the file and convert to Base64 using the original file object
-                imageBase64 = await getBase64(originalFile);
+                // Compress image payload size significantly
+                imageBase64 = await compressAndConvertImage(originalFile);
             } catch (err) {
-                console.error('Image conversion error:', err);
+                console.error('Image compression error:', err);
                 alert('Failed to process image.');
+                submitBtn.textContent = 'SUBMIT REQUEST';
+                submitBtn.disabled = false;
                 return;
             }
         }
@@ -440,10 +471,10 @@
             expiration_date: document.getElementById('expiration_date').value,
             suggested_promo: document.getElementById('suggested_promo').value,
             image_data: imageBase64,  
-            image_name: imageName // This sends the newly renamed file name to Google Drive
+            image_name: imageName 
         };
 
-        // Send data to your Google Apps Script Web App URL
+        // Send data to Google Apps Script Web App URL
         fetch('https://script.google.com/macros/s/AKfycbxd_Ad3embiPBLJc-37FAaOeEHbRN04fTM8RvmFC4M1VvyJDHjMLyNBr9JruJUo9icU1w/exec', {
             method: 'POST',
             mode: 'no-cors',
@@ -451,11 +482,15 @@
             body: JSON.stringify(formData)
         })
         .then(() => {
+            submitBtn.textContent = 'SUBMIT REQUEST';
+            submitBtn.disabled = false;
             showThankYou(); 
         })
         .catch(error => {
             console.error('Error:', error);
             alert('Submission failed. Please try again.');
+            submitBtn.textContent = 'SUBMIT REQUEST';
+            submitBtn.disabled = false;
         });
     });
 
@@ -469,6 +504,7 @@
         document.getElementById('thankYouMessage').style.display = 'none';
         document.getElementById('formContainer').style.display = 'block';
     }
+
 </script>
 
 
