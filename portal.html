@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Near Ex - Choose Portal</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .section { margin-bottom: 20px; }
+    .section:last-of-type { margin-bottom: 0; }
+    .section p { margin: 0 0 8px; font-size: 11px; font-weight: 700; letter-spacing: .5px; text-transform: uppercase; color: var(--muted); }
+    .logout { margin-top: 20px; font: inherit; font-size: 12px; color: var(--muted); background: none; border: none; cursor: pointer; text-decoration: underline; }
+  </style>
+</head>
+<body data-page="portal">
+  <div class="app-wrapper centered">
+    <div class="prototype-banner">*This project was only a prototype developed by: Mark Jake*</div>
+    <main class="content">
+      <img class="top-image" src="login.png" alt="" onerror="this.style.display='none'">
+      <div class="card">
+        <h1 style="margin-bottom:24px;font-size:16px;letter-spacing:.5px">CHOOSE PORTAL</h1>
+        <div class="section">
+          <p>Store Portal</p>
+          <a class="btn secondary" href="store.html">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>STORE
+          </a>
+        </div>
+        <div class="section">
+          <p>Admin Portal</p>
+          <a class="btn secondary" href="admin.html">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>ADMIN
+          </a>
+        </div>
+        <div class="section">
+          <p>Drive Portal</p>
+          <a class="btn secondary" href="drive.html">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-8l-2-2z"/></svg>DRIVE
+          </a>
+        </div>
+      </div>
+    </main>
+  </div>
+  <script src="script.js" defer></script>
+</body>
+</html>

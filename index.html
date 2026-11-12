@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Near Ex - Login</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body data-page="index">
+  <div class="app-wrapper centered">
+    <div class="prototype-banner">*This project was only a prototype developed by: Mark Jake*</div>
+    <main class="content">
+      <img class="top-image" src="login.png" alt="" onerror="this.style.display='none'">
+      <form class="card" id="loginForm" autocomplete="on">
+        <h2>NEAR EX PROJECT</h2>
+        <p class="sub">Secure Login</p>
+        <div class="field">
+          <label for="username">Username</label>
+          <input type="text" id="username" placeholder="Enter username" autocomplete="username" autocapitalize="none" required>
+        </div>
+        <div class="field">
+          <label for="password">Password</label>
+          <input type="password" id="password" placeholder="Enter password" autocomplete="current-password" required>
+        </div>
+        <button type="submit" class="btn" id="loginBtn">LOG IN</button>
+        <div id="message" class="msg" role="status" aria-live="polite"></div>
+      </form>
+    </main>
+  </div>
+  <script src="script.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Near Ex 3.0 Mobile</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .app-body { padding: 16px 16px 80px; }
+    .form-card {
+      margin-bottom: 12px; padding: 14px 16px;
+      background: var(--card-bg); border: 1px solid var(--border); border-radius: 14px;
+      box-shadow: 0 1px 3px rgba(0,0,0,.2);
+    }
+    .form-card:focus-within { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(255,102,0,.2); }
+    .form-card input, .form-card select {
+      width: 100%; padding: 4px 0; font: inherit; font-size: 15px; font-weight: 500;
+      color: var(--text); background: transparent; border: none; outline: none; text-transform: uppercase;
+    }
+    .form-card input[type="file"] { font-size: 13px; text-transform: none; }
+    select option { background: var(--card-bg); color: var(--text); }
+    select:invalid { color: var(--placeholder); }
+    #submitBtn { margin-top: 20px; border-radius: 14px; }
+    .sku-row { display: flex; align-items: center; gap: 10px; }
+    .sku-row input { flex: 1; min-width: 0; }
+    .scan-btn { flex-shrink: 0; width: 46px; height: 46px; display: flex; align-items: center; justify-content: center; color: #fff; background: var(--accent); border: none; border-radius: 12px; cursor: pointer; box-shadow: 0 4px 12px rgba(255,102,0,.3); }
+    .scan-btn:active { background: var(--accent-press); transform: scale(.94); }
+    .scan-btn svg { width: 24px; height: 24px; fill: currentColor; }
+    .scanner { position: absolute; inset: 0; z-index: 2000; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; padding: 20px; background: rgba(2,6,23,.96); }
+    .scanner[hidden] { display: none; }
+    .scan-view { position: relative; width: 100%; max-width: 360px; aspect-ratio: 4/3; overflow: hidden; background: #000; border: 2px solid var(--accent); border-radius: 16px; }
+    .scan-view video { width: 100%; height: 100%; object-fit: cover; }
+    .scan-view::after { content: ""; position: absolute; left: 10%; right: 10%; top: 50%; height: 2px; background: #ef4444; box-shadow: 0 0 8px #ef4444; }
+    .scanner p { margin: 0; font-size: 14px; text-align: center; color: var(--muted); }
+    .scanner .btn { max-width: 360px; }
+    .thanks { display: none; margin-top: 40px; padding: 40px 24px; text-align: center; background: var(--card-bg); border: 1px solid var(--border); border-radius: 20px; }
+    .thanks h2 { margin: 0 0 8px; font-size: 22px; }
+    .thanks p { margin: 0 0 24px; font-size: 14px; color: var(--muted); }
+    .thanks .btn { background: #16a34a; box-shadow: none; font-size: 14px; }
+  </style>
+</head>
+<body data-page="store">
+  <div class="app-wrapper">
+    <header class="app-header">
+      <div class="brand">
+        <img src="eleven.png" alt="" onerror="this.style.display='none'">
+        <div><h1>NEAR EX</h1><span>v3.0 Mobile</span></div>
+      </div>
+      <div class="pill">Store Portal</div>
+    </header>
+
+    <div class="app-body">
+      <div class="prototype-banner">This project was only a prototype by Mark Jake</div>
+
+      <form id="myForm" novalidate>
+        <!-- NOTE: the labels below were swapped against the original ids. The JSON keys sent
+             to Apps Script (store_name = district-area, store_district = name-number) are
+             unchanged so your backend keeps working. -->
+        <div class="form-card">
+          <label class="label" for="district_area">Store District-Area</label>
+          <input type="text" id="district_area" placeholder="Enter district-area" required>
+        </div>
+        <div class="form-card">
+          <label class="label" for="store_number">Store Name-Number</label>
+          <input type="text" id="store_number" placeholder="Enter store & number" required>
+        </div>
+        <div class="form-card">
+          <label class="label" for="store_manager">Store Manager</label>
+          <input type="text" id="store_manager" placeholder="Manager full name" autocomplete="name" required>
+        </div>
+        <div class="form-card">
+          <label class="label" for="store_cluster">Store Cluster</label>
+          <select id="store_cluster" required>
+            <option value="" disabled selected>Select cluster type</option>
+            <option>TRANSIT</option><option>RESIDENTIAL</option><option>SCHOOL</option>
+            <option>HOSPITAL</option><option>TOURIST</option><option>OFFICES</option>
+          </select>
+        </div>
+        <div class="form-card">
+          <label class="label" for="item_category">Item Category</label>
+          <select id="item_category" required>
+            <option value="" disabled selected>Select category</option>
+            <option>HABA</option><option>GROCERY</option><option>CONFECT</option>
+            <option>NON FOOD</option><option>JUICES AND TEAS</option><option>NOODLES</option>
+            <option>BISCUITS</option><option>WINES AND LIQUORS</option>
+            <option value="BOTTLED WATER AND ENERGY DRINKS">BOTTLED WATER &amp; ENERGY DRINKS</option>
+          </select>
+        </div>
+        <div class="form-card">
+          <label class="label" for="item_sku">Item Code (SKU)</label>
+          <!-- text + numeric keypad keeps leading zeros that type="number" would drop -->
+          <div class="sku-row">
+            <input type="text" id="item_sku" inputmode="numeric" pattern="[0-9]+" placeholder="Enter or scan item code" required>
+            <button type="button" class="scan-btn" id="scanBtn" aria-label="Scan barcode" title="Scan barcode">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 4h2v16H2zm3 0h1v16H5zm3 0h3v16H8zm4 0h1v16h-1zm3 0h2v16h-2zm3 0h1v16h-1zm2 0h2v16h-2z"/></svg>
+            </button>
+          </div>
+        </div>
+        <div class="form-card">
+          <label class="label" for="item_image">Upload Item Photo</label>
+          <input type="file" id="item_image" accept="image/*" capture="environment" required>
+        </div>
+        <div class="form-card">
+          <label class="label" for="expiration_date">Expiration Date</label>
+          <input type="date" id="expiration_date" required>
+        </div>
+        <div class="form-card">
+          <label class="label" for="suggested_promo">Suggested Promo</label>
+          <select id="suggested_promo" required>
+            <option value="" disabled selected>Select promo option</option>
+            <option value="BUY 1 TAKE 1">BUY 1 TAKE 1!</option>
+            <option value="50% OFF">50% OFF!</option>
+            <option value="30% OFF">30% OFF!</option>
+            <option value="BUY 2 SAVE ****">BUY 2 SAVE ****</option>
+          </select>
+        </div>
+
+        <button type="submit" class="btn" id="submitBtn">SUBMIT REQUEST</button>
+        <div id="error" class="msg err" role="alert"></div>
+      </form>
+
+      <div class="thanks" id="thanks">
+        <h2>Submitted Successfully!</h2>
+        <p>Your near expiry request has been securely recorded.</p>
+        <button type="button" class="btn" id="againBtn">SUBMIT ANOTHER ENTRY</button>
+      </div>
+    </div>
+
+    <div class="scanner" id="scanner" hidden>
+      <div class="scan-view"><video id="scanVideo" playsinline muted></video></div>
+      <p id="scanMsg" role="status" aria-live="polite">Point the camera at the barcode</p>
+      <button type="button" class="btn secondary" id="scanCancel">CANCEL</button>
+    </div>
+
+    <!-- Outside the form, so it can never trigger a submit -->
+    <a class="fab" href="portal.html" aria-label="Back to portal" title="Back to portal">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20z"/></svg>
+    </a>
+  </div>
+  <script src="script.js" defer></script>
+</body>
+</html>
